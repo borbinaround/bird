@@ -1,0 +1,423 @@
+#include <Servo.h>
+
+const int trigPin = 46;
+const int echoPin = 48;
+// defines variables
+long duration;
+int distance;
+const int mixMotor = 23;
+const int mixZ = 43;
+const int mixY = 53;
+const int lidZ = 41;
+const int creamBlow = 27;
+const int vator = 45;
+const int tasimo = 29;
+const int crushCream = 47;
+const int sugar = 31;
+const int lidY = 39;
+const int conveyer = 49;
+const int cupMotor = 33;
+const int creamConv = 51;
+Servo servoLeft;
+Servo servoRight;
+Servo servoLid;
+//testing cup servo
+Servo servoCup1;
+Servo servoCup2;
+unsigned long time;
+
+const int ledPin = 13;
+int state = 0;
+const int butt1 = 22;
+const int butt2 = 24;
+const int butt3 = 26;
+const int butt4 = 28;
+const int butt5 = 30;
+const int butt6 = 32;
+const int butt7 = 34;
+const int butt8 = 36;
+const int butt9 = 38;
+
+int buttState1;
+
+//methods
+void servoRelease(int d) {
+  //releases cup once by rotating 90 degrees
+  servoCup1.write(90);
+  servoCup2.write(90);
+  delay(130);
+  servoCup1.write(0);
+  servoCup2.write(0);
+  delay(d);
+}
+void releaseCup(int d) {
+  //is supposed to release cup with vex motors, currently is testing code
+  digitalWrite(cupMotor, HIGH);
+  delay(625);
+  digitalWrite(cupMotor, LOW);
+  delay(d);
+}
+
+void mixCoffee(int d) {
+  //turn on motor for whatever many seconds
+  digitalWrite(mixY, HIGH);
+  digitalWrite(mixMotor, HIGH);
+  delay(d);
+}
+
+//note that my Y and Z mixer pins are mixed up
+void mixUp(int d) {
+  //moves the mixer up
+  digitalWrite(mixY, LOW);
+  delay(d);
+}
+void mixDown(int d) {
+  //moves mixer down
+  digitalWrite(mixY, HIGH);
+  delay(d);
+}
+void mixBack(int d) {
+  //moves mixer back
+  digitalWrite(mixZ, LOW);
+  delay(d);
+}
+void mixFor(int d) {
+  //moves mixer forwards
+  digitalWrite(mixZ, HIGH);
+  delay(d);
+}
+//note that my Y and Z lid pins are mixed up
+void lidUp(int d) {
+  //moves lid up
+  digitalWrite(lidZ, LOW);
+  delay(d);
+}
+void lidDown(int d) {
+  //moves lid down
+  digitalWrite(lidZ, HIGH);
+  delay(d);
+}
+void lidGrab(int d) {
+  servoLid.write(20);
+  delay(d);
+}
+void lidRelease(int d) {
+  servoLid.write(80);
+  delay(d);
+}
+void lidFor(int d) {
+  //moves lid forwards
+  digitalWrite(lidY, HIGH);
+  delay(d);
+}
+void lidBack(int d) {
+  //moves lid backwards
+  digitalWrite(lidY, LOW);
+  delay(d);
+}
+
+void vatorUp(int d) {
+  //moves elevator up
+  digitalWrite(vator, LOW);
+  delay(d);
+}
+void vatorDown(int d) {
+  //moves elevator down
+  digitalWrite(vator, HIGH);
+  delay(d);
+}
+void tasDown(int d) {
+  //moves tasimo forwards
+  digitalWrite(tasimo, HIGH);
+  delay(d);
+}
+void tasUp(int d) {
+  //moves tasimo backwards
+  digitalWrite(tasimo, LOW);
+  delay(d);
+}
+void creamRelease(int creams) {
+  for (int k=0; k<creams; k++) {
+  digitalWrite(creamConv, HIGH);
+  delay(2400);
+  digitalWrite(creamConv, LOW);
+  delay(2000);
+  digitalWrite(crushCream, HIGH); 
+  Serial.println("turned on!");
+  delay(18000);
+  Serial.println("put back button");
+  digitalWrite(crushCream, LOW);
+  delay(1000);
+  creamClean(0);
+  delay(2000);
+  }
+}
+
+void releaseSugar(int sugars) {
+  //moves it backwards and forwards to release sugar
+  for (int k = 0; k < sugars; k++) {
+    digitalWrite(sugar, HIGH);
+    delay(700);
+    digitalWrite(sugar, LOW);
+    delay(2000);
+  }
+}
+
+
+void conveyerON(int d) {
+  //turns conveyor on
+  digitalWrite(conveyer, HIGH);
+  delay(d);
+}
+void conveyerOFF(int d) {
+  //turns conveyor off
+  digitalWrite(conveyer, LOW);
+  delay(d);
+}
+
+void mixCoffeeStop(int d) {
+  digitalWrite(mixMotor, LOW);
+  delay(d);
+}
+void creamClean(int d) {
+  digitalWrite(creamBlow, HIGH);
+  delay(100);
+  digitalWrite(creamBlow, LOW);
+  delay(d);
+}
+void getCoffee(int sugar, int cream) {
+  delay(5000);
+        
+  vatorDown(2000);
+  releaseCup(1000);
+  vatorUp(2000);
+  conveyerON(14950);
+  conveyerOFF(1000);
+  tasDown(6000);
+  tasUp(200);
+
+  conveyerON(12400);
+  conveyerOFF(1000);
+
+  //this is how many sugars there will be
+  releaseSugar(sugar);
+  conveyerON(9300);
+  conveyerOFF(1000);
+  //cream stuff
+  creamRelease(cream);
+  conveyerON(12000);
+  conveyerOFF(1000);
+  mixFor(1000);
+  mixDown(1000);
+  mixCoffee(2000);
+  mixCoffeeStop(1000);
+  mixUp(1000);
+  mixBack(2000);
+  conveyerON(9980);
+  conveyerOFF(1000);
+  lidRelease(500);
+  lidDown(1000);
+  lidGrab(1000);
+  lidUp(1000);
+  lidFor(2000);
+  lidDown(1000);
+  lidRelease(500);
+  lidUp(500);
+  lidGrab(500);
+  lidBack(1000);
+  conveyerOFF(2000000000);
+}
+void stationTest() {
+  //goes through one cycle of coffee machine, defaults 2 cream 2 sugar
+  delay(5000);
+  vatorDown(2000);
+  servoRelease(2000);
+  releaseCup(1000);
+  vatorUp(2000);
+  conveyerON(16500);
+  conveyerOFF(1000);
+  //tass stuff
+  delay(130000);
+  Serial.println("YOU SHOULDA YEETED BACK");
+  conveyerON(10900);;
+  conveyerOFF(1000);
+  releaseSugar(1);
+  conveyerON(7950);
+  conveyerOFF(1000);
+  //cream
+  conveyerON(13000);
+  conveyerOFF(1000);
+  mixFor(1000);
+  mixDown(1000);
+  mixCoffee(2000);
+  mixCoffeeStop(1000);
+  mixUp(1000);
+  mixBack(2000);
+  conveyerON(9980);
+  conveyerOFF(1000);
+  lidRelease(500);
+  lidDown(1000);
+  lidGrab(1000);
+  lidUp(1000);
+  lidFor(2000);
+  lidDown(1000);
+  lidRelease(500);
+  lidUp(500);
+  lidGrab(500);
+  lidBack(1000);
+  conveyerOFF(2000000000);
+}
+
+void setup() {
+  //turn everything off
+  servoCup1.attach(8);
+  servoCup2.attach(9);
+  servoLid.attach(13);
+
+  servoCup1.write(0);
+  servoCup2.write(0);
+  servoLid.write(60);
+  digitalWrite(13, LOW);//vextop
+  digitalWrite(12, LOW);//
+  digitalWrite(11, LOW);//vexbot
+  digitalWrite(10, LOW);//
+  digitalWrite(49, LOW);//conveyer
+  digitalWrite(29, LOW);//tasimo
+  digitalWrite(23, LOW);//mixmotor
+  digitalWrite(43, LOW);//mixY
+  digitalWrite(41, LOW);//lidY
+  digitalWrite(27, LOW);//lidZ
+  digitalWrite(45, LOW);//elevator
+  digitalWrite(47, LOW);//crushCream
+  digitalWrite(31, LOW);//sugar
+  digitalWrite(39, LOW);//cream
+  digitalWrite(53, LOW);//mixZ
+  digitalWrite(33, LOW);
+  digitalWrite(51, LOW);
+  //the machine stuff
+  pinMode(13, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(10, OUTPUT);
+
+  pinMode(33, OUTPUT);
+
+  pinMode(49, OUTPUT);
+  pinMode(29, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(43, OUTPUT);
+  pinMode(41, OUTPUT);
+  pinMode(27, OUTPUT);
+  pinMode(45, OUTPUT);
+  pinMode(47, OUTPUT);
+  pinMode(31, OUTPUT);
+  pinMode(39, OUTPUT);
+  pinMode(53, OUTPUT);
+  pinMode(51, OUTPUT);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  //the button stuff
+  pinMode(ledPin, OUTPUT);
+  pinMode(butt1, INPUT);
+  pinMode(butt2, INPUT);
+  pinMode(butt3, INPUT);
+  pinMode(butt4, INPUT);
+  pinMode(butt5, INPUT);
+  pinMode(butt6, INPUT);
+  pinMode(butt7, INPUT);
+  pinMode(butt8, INPUT);
+  pinMode(butt9, INPUT);
+
+  Serial.begin(9600);
+
+  //INSTRUCTIONS, FIRST NUMBER IS #CREAM, SECOND NUMBER IS #SUGAR
+ 
+      delay(5000);
+      
+  getCoffee(2,2);
+  
+}
+
+void loop() {
+  /*
+
+  mixDown(1000);
+  mixCoffee(1000);
+  mixCoffeeStop(1000);
+  mixUp(10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  00);
+  mixFor(1000);
+  mixDown(1000);
+  mixCoffee(1500);
+  mixCoffeeStop(1000);
+  mixUp(1000);
+  mixBack(2000);
+  */
+
+  /*
+  delay(2000);
+  tasForwards();
+  delay(2000);
+  tasON();
+  delay(2000);
+  tasOFF();
+  delay(2000);
+  }
+  */
+}
