@@ -1,3 +1,2 @@
-# bird
-here is the arduino code for the coffee bot project of ace it. 
-borbinaround.blogspot.com 
+# coffeeBot
+Code for students of Mechatronics ACE-IT used for an automated coffee machine.
